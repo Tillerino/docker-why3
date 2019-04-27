@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# To enable running why3 like a local binary, copy this file to a bin folder like ~/bin.
+# Alternatively, link it into your private bin folder: ln -s $(pwd)/why3 $HOME/bin/
+# Make sure that it is executable: chmod u+x why3
+
+# Your working directory will be available under the same folder structure which is mounted under /host.
+# E.g. if you're starting this from /home/user/workspace/project this folder will be available at
+# /host/home/user/workspace/project in the docker container. 
+
+# Note that the docker container is always destroyed after usage.
+# However, your why3 settings are persisted in ~/.docker-why3 on the host machine.
+# To wipe your settings for the docker container, delete that folder on the host machine.
+
+ARGS="$@"
+
+# IP of your X11 host.
+IP=192.168.56.1
+
+PWD=$(pwd)
+
+mkdir -p $HOME/.docker-why3
+
+docker run -e DISPLAY=$IP:0\
+  --rm\
+  -v "$(pwd):/host/$PWD"\
+  -v "$HOME/.docker-why3:/conf"\
+  -w "/host/$PWD"\
+  why3 $ARGS
